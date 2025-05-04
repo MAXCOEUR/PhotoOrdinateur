@@ -1,24 +1,75 @@
 ﻿<Window x:Class="PhotoSyncServer.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="PhotoSync Server" Height="350" Width="400" Closing="Window_Closing">
+        Title="PhotoSync Server" Height="720" Width="1280" Closing="Window_Closing"
+        Background="#2C3E50">
+    <!-- Fond foncé moderne -->
+    <Window.Resources>
+        <!-- Définir un style moderne pour les boutons -->
+        <Style x:Key="ModernButton" TargetType="Button">
+            <Setter Property="Background" Value="#3498db"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="Padding" Value="12,6"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Margin" Value="10"/>
+            <Setter Property="Height" Value="50"/>
+            <Setter Property="Width" Value="Auto"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="10">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Définir un style pour le TextBox -->
+        <Style x:Key="ModernTextBox" TargetType="TextBox">
+            <Setter Property="Background" Value="#f5f5f5"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="Margin" Value="10"/>
+            <Setter Property="BorderBrush" Value="#3498db"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="10"/>
+            <Setter Property="IsReadOnly" Value="True"/>
+        </Style>
+    </Window.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <!-- Ligne pour le bouton -->
             <RowDefinition Height="*"/>
-            <!-- Ligne pour le QR code -->
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
+        <!-- Ligne pour le bouton -->
         <Button Grid.Row="0"
-            Content="Ouvrir le dossier des images"
-            Click="OpenFolderButton_Click"
-            Margin="10"
-            Padding="10,5"/>
+                Content="Ouvrir le dossier des images"
+                Click="OpenFolderButton_Click"
+                Style="{StaticResource ModernButton}"/>
 
+        <!-- Image pour afficher le QR Code -->
         <Image Grid.Row="1"
-           x:Name="QrCodeImage"
-           Margin="10"/>
-    </Grid>
+               x:Name="QrCodeImage"
+               Margin="10"
+               Stretch="Uniform"/>
 
+        <!-- Zone de texte pour afficher le nom de l'image -->
+        <TextBox Grid.Row="2"
+                 x:Name="ImageFileNameTextBox"
+                 Style="{StaticResource ModernTextBox}"
+                 HorizontalAlignment="Stretch"
+                 VerticalAlignment="Center"
+                 VerticalContentAlignment="Center"
+                 Text="Nom de l'image affiché ici..." />
+    </Grid>
 </Window>

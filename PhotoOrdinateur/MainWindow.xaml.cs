@@ -30,7 +30,7 @@ namespace PhotoSyncServer
             {
                 Firewall.AddFirewallRuleForApp(Port);
 
-                server = new PhotoServer(Port, baseFolder, DisplayQrCode);
+                server = new PhotoServer(Port, baseFolder, DisplayQrCode, UpdateImageFileName);
                 server.Start();
             }
             catch (Exception ex)
@@ -40,7 +40,10 @@ namespace PhotoSyncServer
             }
         }
 
-
+        private void UpdateImageFileName(string fileName)
+        {
+            Dispatcher.Invoke(() => ImageFileNameTextBox.Text = fileName);
+        }
 
         private void DisplayQrCode(BitmapImage qrImage)
         {

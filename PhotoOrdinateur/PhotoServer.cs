@@ -17,12 +17,14 @@ namespace PhotoOrdinateur
         private readonly int port;
         private readonly string baseFolder;
         private readonly Action<BitmapImage> qrCodeCallback;
+        private readonly Action<string> imageFileNameCallback;
 
-        public PhotoServer(int port, string baseFolder, Action<BitmapImage> qrCodeCallback)
+        public PhotoServer(int port, string baseFolder, Action<BitmapImage> qrCodeCallback, Action<string> imageFileNameCallback)
         {
             this.port = port;
             this.baseFolder = baseFolder;
             this.qrCodeCallback = qrCodeCallback;
+            this.imageFileNameCallback = imageFileNameCallback;
         }
 
         public async void Start()
@@ -36,7 +38,7 @@ namespace PhotoOrdinateur
                 var image = QrCodeService.Generate(qrContent);
                 qrCodeCallback?.Invoke(image);
 
-                await RunHttpListener(url);
+                await Task.Run(() => RunHttpListener(url));
             }
             catch (Exception ex)
             {
@@ -119,6 +121,8 @@ namespace PhotoOrdinateur
 
                 // Générer le nom de fichier basé sur la date et ajouter le titre entre parenthèses
                 fileName = $"{deviceName}_{fileDate:yyyy-MM-dd_HHmmss} ({originalTitle}){originalExtension}";
+
+                imageFileNameCallback?.Invoke(fileName);
 
                 fileContents = parser.FileContents;
             }

@@ -82,6 +82,14 @@
             "PrerequisitesLocation" = "2:1"
             "Url" = "8:"
             "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.7.2"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4.7.2 (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.7.2"
+                    }
+                }
             }
         }
     }
@@ -190,15 +198,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:PhotoOrdinateur"
-        "ProductCode" = "8:{4EDB5875-DA46-4EED-8C87-F1A424255428}"
-        "PackageCode" = "8:{C56D2776-9EA8-4DB2-8CD9-8271981BFBBB}"
+        "ProductCode" = "8:{879C5A50-21E9-4877-8AD2-17481EAA40CB}"
+        "PackageCode" = "8:{C8A99CD9-B4CC-4890-804E-D0A6A5D2D237}"
         "UpgradeCode" = "8:{F96F21BA-DB80-441F-BB60-98C360DBE75D}"
         "AspNetVersion" = "8:2.0.50727.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:1.0.2"
+        "ProductVersion" = "8:1.0.3"
         "Manufacturer" = "8:MaxenceCOEUR"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
