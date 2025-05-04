@@ -2,6 +2,8 @@
 using QRCoder;
 using System;
 using System.Collections;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Security.Cryptography;
@@ -21,11 +23,24 @@ namespace PhotoSyncServer
         public MainWindow()
         {
             InitializeComponent();
-            Firewall.AddFirewallRuleForApp(Port);
 
-            server = new PhotoServer(Port, baseFolder, DisplayQrCode);
-            server.Start();
+            Title += " " + GetAppVersion(); // Ajoute la version dans la barre de titre
+
+            try
+            {
+                Firewall.AddFirewallRuleForApp(Port);
+
+                server = new PhotoServer(Port, baseFolder, DisplayQrCode);
+                server.Start();
+            }
+            catch (Exception ex)
+            {
+                LogErreur.print("Erreur lors de l'initialisation du serveur", ex);
+                MessageBox.Show("Une erreur est survenue lors du démarrage du serveur.", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
+
+
 
         private void DisplayQrCode(BitmapImage qrImage)
         {
@@ -34,16 +49,41 @@ namespace PhotoSyncServer
 
         private void OpenFolderButton_Click(object sender, RoutedEventArgs e)
         {
-            if (Directory.Exists(baseFolder))
-                System.Diagnostics.Process.Start("explorer.exe", baseFolder);
-            else
-                MessageBox.Show("Le dossier d'images n'existe pas encore.", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+            try
+            {
+                if (Directory.Exists(baseFolder))
+                    System.Diagnostics.Process.Start("explorer.exe", baseFolder);
+                else
+                    MessageBox.Show("Le dossier d'images n'existe pas encore.", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (Exception ex)
+            {
+                LogErreur.print("Erreur lors de l'ouverture du dossier", ex);
+                MessageBox.Show("Impossible d'ouvrir le dossier.", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+
+        private void Window_Closing(object sender, CancelEventArgs e)
         {
-            Firewall.RemoveFirewallRuleForApp();
+            try
+            {
+                Firewall.RemoveFirewallRuleForApp();
+            }
+            catch (Exception ex)
+            {
+                LogErreur.print("Erreur lors de la suppression de la règle pare-feu", ex);
+            }
         }
+
+        private string GetAppVersion()
+        {
+            var version = FileVersionInfo.GetVersionInfo(System.Reflection.Assembly.GetExecutingAssembly().Location).FileVersion;
+            return version != null ? $"v{version}" : "v1.0";
+        }
+
+
+
     }
 
 }

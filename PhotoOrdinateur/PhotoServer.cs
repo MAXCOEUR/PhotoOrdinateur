@@ -7,6 +7,7 @@ using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Media.Imaging;
 
 namespace PhotoOrdinateur
@@ -26,14 +27,21 @@ namespace PhotoOrdinateur
 
         public async void Start()
         {
-            string ip = GetLocalIPAddress();
-            string url = $"http://{ip}:{port}/upload/";
+            try
+            {
+                string ip = GetLocalIPAddress();
+                string url = $"http://{ip}:{port}/upload/";
 
-            string qrContent = System.Text.Json.JsonSerializer.Serialize(new { ip, port });
-            var image = QrCodeService.Generate(qrContent);
-            qrCodeCallback?.Invoke(image);
+                string qrContent = System.Text.Json.JsonSerializer.Serialize(new { ip, port });
+                var image = QrCodeService.Generate(qrContent);
+                qrCodeCallback?.Invoke(image);
 
-            await RunHttpListener(url);
+                await RunHttpListener(url);
+            }
+            catch (Exception ex)
+            {
+                LogErreur.print("Erreur sur le serveur", ex);
+            }
         }
 
         private async Task RunHttpListener(string prefix)
