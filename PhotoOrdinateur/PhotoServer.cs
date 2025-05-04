@@ -120,7 +120,7 @@ namespace PhotoOrdinateur
                     originalTitle = originalTitle.Substring(0, 50);
 
                 // Générer le nom de fichier basé sur la date et ajouter le titre entre parenthèses
-                fileName = $"{deviceName}_{fileDate:yyyy-MM-dd_HHmmss} ({originalTitle}){originalExtension}";
+                fileName = $"{fileDate:yyyy-MM-dd HH_mm_ss} ({deviceName}-{originalTitle}) {originalExtension}";
 
                 imageFileNameCallback?.Invoke(fileName);
 
@@ -135,7 +135,7 @@ namespace PhotoOrdinateur
             }
 
             // Crée le chemin final
-            var folder = Path.Combine(baseFolder, deviceName, fileDate.Year.ToString(), fileDate.Month.ToString("D2"), fileDate.Day.ToString("D2"));
+            var folder = Path.Combine(baseFolder, deviceName, fileDate.Year.ToString(), fileDate.Month.ToString("D2"));
             Directory.CreateDirectory(folder);
 
             string filePath = Path.Combine(folder, fileName);
