@@ -38,7 +38,7 @@ namespace PhotoSyncServer
                 LogErreur.print("Erreur lors de l'initialisation du serveur", ex);
                 MessageBox.Show("Une erreur est survenue lors du démarrage du serveur.", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-        }
+        } 
 
         private void UpdateImageFileName(string fileName)
         {
