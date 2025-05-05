@@ -42,6 +42,14 @@
             <Setter Property="Padding" Value="10"/>
             <Setter Property="IsReadOnly" Value="True"/>
         </Style>
+
+        <!-- Définir un style pour le TextBlock (pour IP et Port) -->
+        <Style x:Key="IpPortTextBlock" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Margin" Value="5"/>
+        </Style>
     </Window.Resources>
 
     <Grid>
@@ -50,26 +58,42 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
 
+        <!-- Affichage de l'IP et du Port dans la même cellule -->
+        <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Vertical" HorizontalAlignment="Left">
+            <TextBlock x:Name="IpTextBox" Text="Chargement ..." Style="{StaticResource IpPortTextBlock}" />
+            <TextBlock x:Name="PortTextBox" Text="Chargement ..." Style="{StaticResource IpPortTextBlock}" />
+        </StackPanel>
+        
         <!-- Ligne pour le bouton -->
         <Button Grid.Row="0"
+                Grid.Column="1"
                 Content="Ouvrir le dossier des images"
                 Click="OpenFolderButton_Click"
                 Style="{StaticResource ModernButton}"/>
 
         <!-- Image pour afficher le QR Code -->
         <Image Grid.Row="1"
+               Grid.Column="0"
+               Grid.ColumnSpan="2"
                x:Name="QrCodeImage"
                Margin="10"
                Stretch="Uniform"/>
 
         <!-- Zone de texte pour afficher le nom de l'image -->
         <TextBox Grid.Row="2"
+                 Grid.Column="0"
+                 Grid.ColumnSpan="2"
                  x:Name="ImageFileNameTextBox"
                  Style="{StaticResource ModernTextBox}"
                  HorizontalAlignment="Stretch"
                  VerticalAlignment="Center"
                  VerticalContentAlignment="Center"
                  Text="Nom de l'image affiché ici..." />
+        
     </Grid>
 </Window>

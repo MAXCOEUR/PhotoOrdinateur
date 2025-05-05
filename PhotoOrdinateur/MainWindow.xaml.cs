@@ -16,7 +16,6 @@ namespace PhotoSyncServer
 {
     public partial class MainWindow : Window
     {
-        private const int Port = 8080;
         private readonly string baseFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Photos");
         private PhotoServer server;
 
@@ -28,9 +27,7 @@ namespace PhotoSyncServer
 
             try
             {
-                Firewall.AddFirewallRuleForApp(Port);
-
-                server = new PhotoServer(Port, baseFolder, DisplayQrCode, UpdateImageFileName);
+                server = new PhotoServer(baseFolder, DisplayIpPort,DisplayQrCode, UpdateImageFileName);
                 server.Start();
             }
             catch (Exception ex)
@@ -38,7 +35,7 @@ namespace PhotoSyncServer
                 LogErreur.print("Erreur lors de l'initialisation du serveur", ex);
                 MessageBox.Show("Une erreur est survenue lors du démarrage du serveur.", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-        } 
+        }
 
         private void UpdateImageFileName(string fileName)
         {
@@ -48,6 +45,14 @@ namespace PhotoSyncServer
         private void DisplayQrCode(BitmapImage qrImage)
         {
             Dispatcher.Invoke(() => QrCodeImage.Source = qrImage);
+        }
+        private void DisplayIpPort((string, int) ipPort)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                IpTextBox.Text = "Ip : " + ipPort.Item1;
+                PortTextBox.Text = "Port : " + ipPort.Item2.ToString();
+            });
         }
 
         private void OpenFolderButton_Click(object sender, RoutedEventArgs e)

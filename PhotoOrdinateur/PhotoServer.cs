@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Sockets;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,15 +16,16 @@ namespace PhotoOrdinateur
 {
     public class PhotoServer
     {
-        private readonly int port;
+        private int port = 8080;
         private readonly string baseFolder;
+        private readonly Action<(string, int)> IpPortCallback;
         private readonly Action<BitmapImage> qrCodeCallback;
         private readonly Action<string> imageFileNameCallback;
 
-        public PhotoServer(int port, string baseFolder, Action<BitmapImage> qrCodeCallback, Action<string> imageFileNameCallback)
+        public PhotoServer(string baseFolder, Action<(string, int)> IpPortCallback, Action<BitmapImage> qrCodeCallback, Action<string> imageFileNameCallback)
         {
-            this.port = port;
             this.baseFolder = baseFolder;
+            this.IpPortCallback = IpPortCallback;
             this.qrCodeCallback = qrCodeCallback;
             this.imageFileNameCallback = imageFileNameCallback;
         }
@@ -31,14 +34,25 @@ namespace PhotoOrdinateur
         {
             try
             {
+                while (IsPortInUse(port))
+                {
+                    port++;
+                    if (port > 65535)
+                    {
+                        MessageBox.Show("Aucun port libre trouvé", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
+                        return;
+                    }
+                }
+                Firewall.AddFirewallRuleForApp(port);
                 string ip = GetLocalIPAddress();
                 string url = $"http://{ip}:{port}/upload/";
+
+                Task.Run(() => RunHttpListener(url));
 
                 string qrContent = System.Text.Json.JsonSerializer.Serialize(new { ip, port });
                 var image = QrCodeService.Generate(qrContent);
                 qrCodeCallback?.Invoke(image);
-
-                await Task.Run(() => RunHttpListener(url));
+                IpPortCallback?.Invoke((ip, port));
             }
             catch (Exception ex)
             {
@@ -120,7 +134,7 @@ namespace PhotoOrdinateur
                     originalTitle = originalTitle.Substring(0, 50);
 
                 // Générer le nom de fichier basé sur la date et ajouter le titre entre parenthèses
-                fileName = $"{fileDate:yyyy-MM-dd HH_mm_ss} ({deviceName}-{originalTitle}) {originalExtension}";
+                fileName = $"{fileDate:yyyy-MM-dd HH_mm_ss} ({deviceName}-{originalTitle}){originalExtension}";
 
                 imageFileNameCallback?.Invoke(fileName);
 
@@ -172,6 +186,40 @@ namespace PhotoOrdinateur
                     return ip.ToString();
             }
             return "127.0.0.1";
+        }
+
+        private bool IsPortInUse(int port)
+        {
+            try
+            {
+                // Préparer la commande netstat
+                var processStartInfo = new ProcessStartInfo
+                {
+                    FileName = "cmd.exe",  // Lancer cmd.exe
+                    Arguments = $"/C netstat -ano | findstr :{port}",  // Exécuter netstat et rechercher le port
+                    RedirectStandardOutput = true,  // Rediriger la sortie standard
+                    RedirectStandardError = false,  // Pas besoin de rediriger les erreurs
+                    UseShellExecute = false,  // Ne pas utiliser le shell
+                    CreateNoWindow = true  // Pas d'affichage de la fenêtre de CMD
+                };
+
+                // Démarrer le processus
+                using (var process = Process.Start(processStartInfo))
+                {
+                    // Lire la sortie
+                    string output = process.StandardOutput.ReadToEnd();
+                    process.WaitForExit();  // Attendre la fin du processus
+
+                    // Si la sortie contient quelque chose, cela signifie que le port est utilisé
+                    return !string.IsNullOrEmpty(output);
+                }
+            }
+            catch (Exception ex)
+            {
+                // En cas d'erreur, loguer et supposer que le port est libre
+                Console.WriteLine($"Erreur lors de la vérification du port : {ex.Message}");
+                return false;
+            }
         }
     }
 
