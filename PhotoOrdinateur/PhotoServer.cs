@@ -45,7 +45,7 @@ namespace PhotoOrdinateur
                 }
                 Firewall.AddFirewallRuleForApp(port);
                 string ip = GetLocalIPAddress();
-                string url = $"http://{ip}:{port}/upload/";
+                string url = $"http://{ip}:{port}";
 
                 Task.Run(() => RunHttpListener(url));
 
@@ -63,30 +63,47 @@ namespace PhotoOrdinateur
         private async Task RunHttpListener(string prefix)
         {
             HttpListener listener = new HttpListener();
-            listener.Prefixes.Add(prefix);
+
+            const string UPLOAD_PATH = "/upload/";
+            const string TEST_PATH = "/test/";
+
+            string urUpload = prefix + UPLOAD_PATH;
+            string urlTest = prefix + TEST_PATH;
+
+            listener.Prefixes.Add(urUpload);
+            listener.Prefixes.Add(urlTest);
             listener.Start();
             Console.WriteLine($"Listening on {prefix}");
 
             while (true)
             {
                 var context = await listener.GetContextAsync();
-                if (context.Request.HttpMethod == "POST")
+                string requestPath = context.Request.Url.AbsolutePath;
+                if (requestPath.EndsWith("/"))
                 {
+                    requestPath = requestPath.TrimEnd('/');
+                }
+
+                // Vérifier le chemin de la requête et la méthode HTTP
+                if (requestPath == UPLOAD_PATH.TrimEnd('/') && context.Request.HttpMethod == "POST")
+                {
+                    // Gérer le téléchargement pour le préfixe de base
                     await HandleUpload(context);
                 }
-                else if (context.Request.HttpMethod == "GET")
+                else if (requestPath == TEST_PATH.TrimEnd('/') && context.Request.HttpMethod == "GET")
                 {
-                    context.Response.StatusCode = 200; // Method Not Allowed
+                    // Répondre avec un code 200 pour une requête GET sur /test
+                    context.Response.StatusCode = 200;
                     context.Response.Close();
                 }
                 else
                 {
+                    // Si la méthode n'est pas autorisée
                     context.Response.StatusCode = 405; // Method Not Allowed
                     context.Response.Close();
                 }
             }
         }
-
         private async Task HandleUpload(HttpListenerContext context)
         {
             var contentType = context.Request.ContentType ?? "";
