@@ -16,7 +16,7 @@ namespace PhotoSyncServer
 {
     public partial class MainWindow : Window
     {
-        private readonly string baseFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Photos");
+        private readonly string baseFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
         private PhotoServer server;
 
         public MainWindow()
